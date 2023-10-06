@@ -32,7 +32,7 @@ jobs:
     - name: Download image URL artifact
       uses: actions/download-artifact@v2
       with:
-      name: image-url
+        name: image-url
 
     - name: Read image URL from artifact
       id: read-image-url
