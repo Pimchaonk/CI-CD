@@ -1,4 +1,4 @@
-name: CI
+name: Build and Push to ECR
 
 on:
   push:
@@ -18,8 +18,8 @@ permissions:
   contents: read
 
 jobs:
-  CI:
-    name: CI
+  build-and-push:
+    name: Build and Push to ECR
     runs-on: ubuntu-latest
     environment: production
 
