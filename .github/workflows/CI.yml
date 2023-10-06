@@ -52,3 +52,9 @@ jobs:
         echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
 
         #This line saves the pushed image information to a GitHub Actions output variable called image. The information includes the ECR registry URL, the ECR repository name, and the image tag.
+
+      - name: Upload image URL as an artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: image-url
+          path: .$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
