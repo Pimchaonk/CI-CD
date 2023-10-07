@@ -34,7 +34,7 @@ jobs:
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
 
-      
+
     - name: Build, tag, and push image to Amazon ECR
       id: build-image
       env:
@@ -69,7 +69,7 @@ jobs:
       uses: actions/download-artifact@v2
       with:
         name: image-info
-        path: .
+        path: image.txt
 
     - name: Read image information from file
       id: read-image-info
