@@ -1,0 +1,70 @@
+name: Build, Push to ECR, and Deploy to ECS
+
+on:
+  push:
+    branches: [ "main" ]
+
+env:
+  AWS_REGION: ap-southeast-1
+  ECR_REPOSITORY: doggy_repo
+  ECS_SERVICE: doggy-app
+  ECS_CLUSTER: doggy-app
+  ECS_TASK_DEFINITION: task-definition.json
+  CONTAINER_NAME: ecs-doggy-sandbox
+  AWS_SDK_LOAD_CONFIG: 1
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-push:
+    name: Build and Push to ECR
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Configure AWS credentials for ECR
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+
+    - name: Build, tag, and push image to Amazon ECR
+      id: build-image
+      run: |
+        docker build -t $ECR_REPOSITORY:$GITHUB_SHA .
+        docker tag $ECR_REPOSITORY:$GITHUB_SHA $ECR_REPOSITORY:latest
+        echo ${{ secrets.AWS_SECRET_ACCESS_KEY }} | docker login -u AWS --password-stdin https://$ECR_REPOSITORY.${{ env.AWS_REGION }}.amazonaws.com
+        docker push $ECR_REPOSITORY:$GITHUB_SHA
+        docker push $ECR_REPOSITORY:latest
+
+  deploy:
+    name: Deploy to ECS
+    runs-on: ubuntu-latest
+    needs: build-and-push
+    environment: production
+
+    steps:
+    - name: Wait for image build and push completion
+      run: exit 0
+      if: always()
+
+    - name: Fill in the new image ID in the Amazon ECS task definition
+      id: task-def
+      uses: aws-actions/amazon-ecs-render-task-definition@v1
+      with:
+        task-definition: ${{ env.ECS_TASK_DEFINITION }}
+        container-name: ${{ env.CONTAINER_NAME }}
+        image: $ECR_REPOSITORY:lastest
+
+    - name: Deploy Amazon ECS task definition
+      uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+      with:
+        task-definition: ${{ steps.task-def.outputs.task-definition }}
+        service: ${{ env.ECS_SERVICE }}
+        cluster: ${{ env.ECS_CLUSTER }}
+        wait-for-service-stability: true
