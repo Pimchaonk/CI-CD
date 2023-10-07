@@ -49,7 +49,7 @@ jobs:
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
         echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
-        echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+        
 
         #This line saves the pushed image information to a GitHub Actions output variable called image. The information includes the ECR registry URL, the ECR repository name, and the image tag.
 
@@ -71,7 +71,7 @@ jobs:
         task-definition: ${{ env.ECS_TASK_DEFINITION }}
         #The task definition JSON file contains the configuration for your ECS task, including the container definitions.
         container-name: ${{ env.CONTAINER_NAME }}
-        image: ${{ steps.build-image.outputs.image }}
+        image: ${{ needs.build-and-push.outputs.image}}
 
     - name: Deploy Amazon ECS task definition
       uses: aws-actions/amazon-ecs-deploy-task-definition@v1
