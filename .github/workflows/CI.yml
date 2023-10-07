@@ -56,5 +56,5 @@ jobs:
     - name: Upload image URL as an artifact
       uses: actions/upload-artifact@v2
       with:
-        name: image-url
-        path: $GITHUB_OUTPUT
+        name: app-image
+        path: $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG

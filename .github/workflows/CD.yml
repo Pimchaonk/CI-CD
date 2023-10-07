@@ -24,7 +24,7 @@ jobs:
     name: Deploy
     runs-on: ubuntu-latest
     environment: production
-    needs: [Build and Push to ECR]
+    
 
     steps:
     - name: Checkout
@@ -38,11 +38,11 @@ jobs:
     - name: Download image URL artifact
       uses: actions/download-artifact@v2
       with:
-        name: image-url
+        name: app-image
 
     - name: Read image URL from artifact
       id: read-image-url
-      run: echo "::set-output name=image-url::$(cat image-url)"
+      run: echo "::set-output name=image-url::$(cat app-image)"
 
     - name: Fill in the new image ID in the Amazon ECS task definition
       id: task-def
