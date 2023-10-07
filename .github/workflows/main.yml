@@ -6,8 +6,8 @@ on:
 
 env:
   AWS_REGION: ap-southeast-1
-  ECR_REPOSITORY: doggy_repo
-  ECS_SERVICE: doggy-app
+  ECR_REPOSITORY: po
+  ECS_SERVICE: doggy-app123
   ECS_CLUSTER: doggy-app
   ECS_TASK_DEFINITION: task-definition.json
   CONTAINER_NAME: ecs-doggy-sandbox
