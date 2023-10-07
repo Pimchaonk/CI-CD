@@ -13,8 +13,7 @@ env:
   CONTAINER_NAME: ecs-doggy-sandbox
   AWS_SDK_LOAD_CONFIG: 1
   ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-                                                                                                                                                                                    IMAGE_TAG: lastest 
-
+  
 permissions:
   contents: read
 
