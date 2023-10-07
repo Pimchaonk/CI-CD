@@ -30,19 +30,19 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v3
 
-    - name: Set up Node.js
-      uses: actions/setup-node@v2
-      with:
-        node-version: 16  # Specify the Node.js version you want to use
+    #- name: Set up Node.js
+    #  uses: actions/setup-node@v2
+    #  with:
+    #    node-version: 16  # Specify the Node.js version you want to use
 
-    - name: Download image URL artifact
-      uses: actions/download-artifact@v2
-      with:
-        name: app-image
+    #- name: Download image URL artifact
+    #  uses: actions/download-artifact@v2
+    #  with:
+    #    name: app-image
 
-    - name: Read image URL from artifact
-      id: read-image-url
-      run: echo "::set-output name=image-url::$(cat app-image)"
+    #- name: Read image URL from artifact
+    #  id: read-image-url
+    #  run: echo "::set-output name=image-url::$(cat app-image)"
 
     - name: Fill in the new image ID in the Amazon ECS task definition
       id: task-def
