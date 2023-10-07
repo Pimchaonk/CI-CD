@@ -57,4 +57,4 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: image-url
-        path: .$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        path: $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
