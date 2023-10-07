@@ -24,6 +24,7 @@ jobs:
     name: Deploy
     runs-on: ubuntu-latest
     environment: production
+    needs: [Build and Push to ECR]
 
     steps:
     - name: Checkout
