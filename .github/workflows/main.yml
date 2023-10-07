@@ -12,7 +12,6 @@ env:
   ECS_TASK_DEFINITION: task-definition.json
   CONTAINER_NAME: ecs-doggy-sandbox
   AWS_SDK_LOAD_CONFIG: 1
-  ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
   
 permissions:
   contents: read
@@ -41,16 +40,22 @@ jobs:
     - name: Build, tag, and push image to Amazon ECR
       id: build-image
       env:
-      #  ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-      #  IMAGE_TAG: lastest #${{ github.sha }}
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        IMAGE_TAG: lastest #${{ github.sha }}
       run: |
         # Build a docker container and
         # push it to ECR so that it can
         # be deployed to ECS.
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-        echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
-        
+        echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> image.txt
+
+      # Save the image information as an artifact
+      - name: Upload image file
+        uses: actions/upload-artifact@v2
+        with:
+          name: image-info
+          path: image.txt
 
         #This line saves the pushed image information to a GitHub Actions output variable called image. The information includes the ECR registry URL, the ECR repository name, and the image tag.
 
@@ -65,6 +70,16 @@ jobs:
       run: exit 0
       if: always()
 
+    - name: Download image information file
+      uses: actions/download-artifact@v2
+      with:
+        name: image-info
+        path: .
+
+    - name: Read image information from file
+      id: read-image-info
+      run: echo "::set-output name=image::$(cat image.txt)"
+
     - name: Fill in the new image ID in the Amazon ECS task definition
       id: task-def
       uses: aws-actions/amazon-ecs-render-task-definition@v1
@@ -72,7 +87,7 @@ jobs:
         task-definition: ${{ env.ECS_TASK_DEFINITION }}
         #The task definition JSON file contains the configuration for your ECS task, including the container definitions.
         container-name: ${{ env.CONTAINER_NAME }}
-        image: ${{ needs.build-and-push.outputs.output1}}
+        image: ${{ steps.read-image-info.outputs.image }}
 
     - name: Deploy Amazon ECS task definition
       uses: aws-actions/amazon-ecs-deploy-task-definition@v1
